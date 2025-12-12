@@ -1,0 +1,2 @@
+config SHIELD_NICENANO_TEST
+    def_bool $(SHIELD_nicenano_test)

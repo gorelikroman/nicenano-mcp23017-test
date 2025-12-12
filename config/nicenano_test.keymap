@@ -1,0 +1,95 @@
+#include <behaviors.dtsi>
+#include <dt-bindings/zmk/keys.h>
+#include <dt-bindings/zmk/bt.h>
+#include <dt-bindings/zmk/outputs.h>
+
+// Определяем кастомное поведение для тестирования MCP23017
+/ {
+    behaviors {
+        // Поведение для тестирования GPIO
+        test_gpio: test_gpio {
+            compatible = "zmk,behavior-tap-dance";
+            label = "TEST_GPIO";
+            #binding-cells = <0>;
+            tapping-term-ms = <200>;
+            bindings = <&kp A>, <&kp B>;
+        };
+    };
+
+    // Конфигурация I2C для MCP23017
+    &i2c0 {
+        status = "okay";
+        clock-frequency = <I2C_BITRATE_STANDARD>;
+        
+        mcp23017: mcp23017@20 {
+            compatible = "microchip,mcp23017";
+            reg = <0x20>;
+            label = "MCP23017";
+            gpio-controller;
+            #gpio-cells = <2>;
+            ngpios = <16>;
+        };
+    };
+
+    keymap {
+        compatible = "zmk,keymap";
+
+        // Основной слой - тестирование всех GPIO на Nice!Nano v2
+        default_layer {
+            label = "Base";
+            bindings = <
+                // Первая строка - GPIO P0.xx на Nice!Nano
+                &kp Q       &kp W       &kp E       &kp R       &kp T       &kp Y
+                &kp A       &kp S       &kp D       &kp F       &kp G       &kp H
+                &kp Z       &kp X       &kp C       &kp V       &kp B       &kp N
+                
+                // Вторая строка - GPIO P1.xx на Nice!Nano
+                &kp U       &kp I       &kp O       &kp P       &kp LBKT    &kp RBKT
+                &kp J       &kp K       &kp L       &kp SEMI    &kp APOS    &kp ENTER
+                &kp M       &kp COMMA   &kp DOT     &kp FSLH    &kp RSHIFT  &kp UP
+                
+                // Третья строка - MCP23017 GPIO (порт A)
+                &kp N1      &kp N2      &kp N3      &kp N4      &kp N5      &kp N6
+                &kp TAB     &kp CAPS    &kp LSHIFT  &kp LCTRL   &kp LGUI    &kp LALT
+                
+                // Четвертая строка - MCP23017 GPIO (порт B)
+                &kp N7      &kp N8      &kp N9      &kp N0      &kp MINUS   &kp EQUAL
+                &kp SPACE   &kp RALT    &kp RCTRL   &kp LEFT    &kp DOWN    &kp RIGHT
+            >;
+        };
+
+        // Дополнительный слой для функциональных клавиш
+        function_layer {
+            label = "Func";
+            bindings = <
+                // F-клавиши для тестирования
+                &kp F1      &kp F2      &kp F3      &kp F4      &kp F5      &kp F6
+                &kp F7      &kp F8      &kp F9      &kp F10     &kp F11     &kp F12
+                &bt BT_CLR  &bt BT_SEL 0 &bt BT_SEL 1 &bt BT_SEL 2 &out OUT_USB &out OUT_BLE
+                
+                // Остальные тестовые привязки
+                &kp HOME    &kp END     &kp PG_UP   &kp PG_DN   &kp INS     &kp DEL
+                &kp ESC     &kp BSPC    &kp PSCRN   &kp SLCK    &kp PAUSE   &kp MENU
+                &kp GRAVE   &kp BSLH    &trans      &trans      &trans      &trans
+                
+                &trans      &trans      &trans      &trans      &trans      &trans
+                &trans      &trans      &trans      &trans      &trans      &trans
+            >;
+        };
+    };
+
+    // Активация дополнительного слоя
+    conditional_layers {
+        compatible = "zmk,conditional-layers";
+        tri_layer {
+            if-layers = <0 1>;
+            then-layer = <1>;
+        };
+    };
+};
+
+// Настройка пинов для Nice!Nano v2
+&default_transform {
+    col-offset = <0>;
+    row-offset = <0>;
+};

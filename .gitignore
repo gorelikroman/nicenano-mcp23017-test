@@ -1,0 +1,10 @@
+build/
+.west/
+modules/
+tools/
+zephyr/
+bootloader/
+zmk/
+.vscode/
+*.uf2
+.DS_Store
