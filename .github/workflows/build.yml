@@ -9,6 +9,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      
       - name: Cache west modules
         uses: actions/cache@v4
         env:
@@ -20,25 +21,29 @@ jobs:
             zephyr/
             bootloader/
             zmk/
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/west.yml', '**/build.yaml') }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('config/**') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
+      
       - name: West Init
         run: west init -l config
+      
       - name: West Update
         run: west update
+      
       - name: West Zephyr export
         run: west zephyr-export
+      
       - name: West Build (Nice!Nano v2)
-        run: west build -s zmk/app -b nice_nano_v2 -- -DSHIELD=nicenano_test -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
-      - name: Nice!Nano v2 Kconfig file
-        run: cat build/zephyr/.config | grep -v "^#" | grep -v "^$"
+        run: west build -s zmk/app -b nice_nano_v2 -- -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
+      
       - name: Rename zmk.uf2
-        run: cp build/zephyr/zmk.uf2 nicenano_test-nice_nano_v2-zmk.uf2
+        run: cp build/zephyr/zmk.uf2 nicenano_mcp23017_test.uf2
+      
       - name: Archive (Nice!Nano v2)
         uses: actions/upload-artifact@v4
         with:
           name: firmware
-          path: nicenano_test-nice_nano_v2-zmk.uf2
+          path: nicenano_mcp23017_test.uf2
