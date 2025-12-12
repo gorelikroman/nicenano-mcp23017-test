@@ -36,14 +36,14 @@ jobs:
       - name: West Zephyr export
         run: west zephyr-export
       
-      - name: West Build (Nice!Nano v2)
-        run: west build -s zmk/app -b nice_nano_v2 -- -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
+      - name: West Build (Nice!Nano v2 - settings reset)
+        run: west build -s zmk/app -b nice_nano_v2 -- -DSHIELD=settings_reset
       
       - name: Rename zmk.uf2
-        run: cp build/zephyr/zmk.uf2 nicenano_mcp23017_test.uf2
+        run: cp build/zephyr/zmk.uf2 nicenano_settings_reset.uf2
       
-      - name: Archive (Nice!Nano v2)
+      - name: Archive firmware
         uses: actions/upload-artifact@v4
         with:
           name: firmware
-          path: nicenano_mcp23017_test.uf2
+          path: nicenano_settings_reset.uf2
